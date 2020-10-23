@@ -65,16 +65,14 @@ class NotToday(object):
 
         for i, block in enumerate(blocks):
             if self.mode == 'ECB':
-                print(binascii.hexlify(block))
                 temp = switch_half_blocks(block, BLOCK_SIZE)
-                print(binascii.hexlify(temp))
-                dec = self._feistel_net(temp)
+                dec = self._feistel_net(temp, encrypt=False)
                 dec = switch_half_blocks(dec, BLOCK_SIZE)
                 dec_blocks.append(dec)
             elif self.mode == 'CBC':
                 xorwith = iv if i == 0 else blocks[-1]
                 temp = switch_half_blocks(block, BLOCK_SIZE)
-                dec = self._feistel_net(temp)
+                dec = self._feistel_net(temp, encrypt=False)
                 dec = switch_half_blocks(dec, BLOCK_SIZE)
                 dec = xor_bytes(dec, xorwith)
                 dec_blocks.append(dec)
@@ -88,14 +86,15 @@ class NotToday(object):
         
         return blocks_to_text(dec_blocks)
 
-    def _feistel_net(self, block: bytes) -> bytes:
+    def _feistel_net(self, block: bytes, encrypt: bool = True) -> bytes:
         total_length = len(block)
         half_length = total_length // 2
         l = block[:half_length]
         r = block[half_length:]
 
         for i in range(ROUND_NUM):
-            new_r = xor_bytes(l, self._f_function(r, self.subkeys[i]))
+            subkey = self.subkeys[i] if encrypt else self.subkeys[ROUND_NUM - (i+1)]
+            new_r = xor_bytes(l, self._f_function(r, subkey))
             l = r
             r = new_r
 

@@ -22,6 +22,7 @@ def text_to_blocks(t: bytes, block_size: int) -> List[bytes]:
     padding_size = (block_size * (t_len // block_size + 1)) % t_len
     
     temp = [b for b in t] + [padding_size - 1 for _ in range(padding_size)] 
+    t_len = len(temp)
     temp = [bytes(temp[i*block_size:(i+1)*block_size]) for i in range(t_len // block_size)]
 
     return temp

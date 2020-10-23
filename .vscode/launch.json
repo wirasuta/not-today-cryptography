@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "main.py",
-            "args": ["i putu gede wira", "CBC", "aaaabbbbccccddddeeeeffff"],
+            "args": ["-x", "AAAAAAAAAAAAAAAA", "ECB", "aaaabbbbccccddddeeeeffff"],
             "console": "integratedTerminal"
         }
     ]
