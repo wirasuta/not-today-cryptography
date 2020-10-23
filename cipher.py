@@ -15,7 +15,17 @@ class NotToday(object):
         pass
 
     def _feistel_net(self, block: bytes, round_key: bytes) -> bytes:
-        pass
+        total_length = len(block)
+        half_length = total_length // 2
+        l = block[0:half_length]
+        r = block[half_length:total_length]
+
+        for i in range(16):
+            new_r = l ^ self._f_function(r, round_key[i]) # round_key should be array of bytes
+            l = r
+            r = new_r
+
+        return l + r
 
     def _f_function(self, half_block: bytes, round_key: bytes) -> bytes:
         pass
