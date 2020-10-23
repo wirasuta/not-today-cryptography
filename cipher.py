@@ -39,15 +39,15 @@ class NotToday(object):
         enc_blocks = []
 
         for i, block in enumerate(blocks):
-            if mode == 'ECB':
+            if self.mode == 'ECB':
                 enc = self._feistel_net(block)
                 enc_blocks.append(enc)
-            elif mode == 'CBC':
+            elif self.mode == 'CBC':
                 xorwith = iv if i == 0 else enc_blocks[-1]
                 temp = xor_bytes(block, xorwith)
                 enc = self._feistel_net(temp)
                 enc_blocks.append(enc)
-            elif mode == 'Counter':
+            elif self.mode == 'Counter':
                 counter_block = counter_to_block(i)
                 enc = self._feistel_net(counter_block)
                 enc = xor_bytes(block, enc)
@@ -91,10 +91,10 @@ class NotToday(object):
         l = block[0:half_length]
         r = block[half_length:total_length]
 
-        for i in range(16):
-            new_r = l ^ self._f_function(r, self.subkeys[i])
+        for i in range(15):
+            new_r = int.from_bytes(l, 'little') ^ int.from_bytes(self._f_function(r, self.subkeys[i]), 'little')
             l = r
-            r = new_r
+            r = new_r.to_bytes(8, 'little')
 
         return l + r
 
@@ -110,7 +110,7 @@ class NotToday(object):
         # S-Box substitution
         subs = bytes()
         for i in range(8):
-            subs = subs + bytes([sbox[temp[i]]])
+            subs = subs + bytes([self.sbox[temp[i]]])
 
         return roll_bits_right(subs, subs[7] % 64)
 
