@@ -1,2 +1,3 @@
 ROUND_NUM = 15
+BLOCK_SIZE = 16
 SBOX = []
