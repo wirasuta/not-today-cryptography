@@ -1,6 +1,7 @@
 from typing import List
 from config import *
 from utils import *
+import binascii
 
 class NotToday(object):
     sbox =  [0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67,
@@ -63,19 +64,21 @@ class NotToday(object):
         dec_blocks = []
 
         for i, block in enumerate(blocks):
-            if mode == 'ECB':
+            if self.mode == 'ECB':
+                print(binascii.hexlify(block))
                 temp = switch_half_blocks(block, BLOCK_SIZE)
+                print(binascii.hexlify(temp))
                 dec = self._feistel_net(temp)
                 dec = switch_half_blocks(dec, BLOCK_SIZE)
                 dec_blocks.append(dec)
-            elif mode == 'CBC':
+            elif self.mode == 'CBC':
                 xorwith = iv if i == 0 else blocks[-1]
                 temp = switch_half_blocks(block, BLOCK_SIZE)
                 dec = self._feistel_net(temp)
                 dec = switch_half_blocks(dec, BLOCK_SIZE)
                 dec = xor_bytes(dec, xorwith)
                 dec_blocks.append(dec)
-            elif mode == 'Counter':
+            elif self.mode == 'Counter':
                 counter_block = counter_to_block(i)
                 enc = self._feistel_net(counter_block)
                 dec = xor_bytes(block, enc)
@@ -88,13 +91,13 @@ class NotToday(object):
     def _feistel_net(self, block: bytes) -> bytes:
         total_length = len(block)
         half_length = total_length // 2
-        l = block[0:half_length]
-        r = block[half_length:total_length]
+        l = block[:half_length]
+        r = block[half_length:]
 
         for i in range(ROUND_NUM):
-            new_r = int.from_bytes(l, 'little') ^ int.from_bytes(self._f_function(r, self.subkeys[i]), 'little')
+            new_r = xor_bytes(l, self._f_function(r, self.subkeys[i]))
             l = r
-            r = new_r.to_bytes(8, 'little')
+            r = new_r
 
         return l + r
 

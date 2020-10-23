@@ -6,9 +6,10 @@ from cipher import NotToday
 
 def init_argparse():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='plaintext to be encrypted or ciphertext to be decrypted if -d is present', type=str)
     parser.add_argument('mode', help='mode of operation, available ECB/CBC/Counter', type=str)
     parser.add_argument('key', help='192 bit key', type=str)
+    parser.add_argument('-i', '--input', help='plaintext to be encrypted or ciphertext to be decrypted if -d is present', type=str)
+    parser.add_argument('-f', '--file', help='input file', type=str)
     parser.add_argument('-d', '--decrypt', action='store_true', help='decrypt input')
     parser.add_argument('-t', '--time', action='store_true', help='time the encryption')
     parser.add_argument('-x', '--hex', action='store_true', help='print in hex format')
@@ -21,14 +22,21 @@ if __name__ == "__main__":
     if args.time:
         start = time.time()
 
-    if args.decrypt:
-        result = not_today.decrypt(bytes(args.input, 'utf-8'))
+    if args.file:
+        user_input = open(args.file, 'rb').read()
     else:
-        result = not_today.encrypt(bytes(args.input, 'utf-8'))
+        user_input = bytes(args.input, 'utf-8')
+
+    if args.decrypt:
+        result = not_today.decrypt(user_input)
+    else:
+        result = not_today.encrypt(user_input)
     
     if args.hex:
         result = hexlify(result)
-    print(result)
+        print(result)
+    else:
+        sys.stdout.buffer.write(result)
 
     if args.time:
         end = time.time()

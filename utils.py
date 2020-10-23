@@ -22,7 +22,7 @@ def text_to_blocks(t: bytes, block_size: int) -> List[bytes]:
     padding_size = (block_size * (t_len // block_size + 1)) % t_len
     
     temp = [b for b in t] + [padding_size - 1 for _ in range(padding_size)] 
-    temp = [temp[i*block_size:(i+1)*block_size] for i in range(t_len // block_size)]
+    temp = [bytes(temp[i*block_size:(i+1)*block_size]) for i in range(t_len // block_size)]
 
     return temp
 
@@ -33,12 +33,12 @@ def all_same(items):
 def blocks_to_text(blocks: List[bytes]) -> bytes:
     temp = b''.join(blocks)
     last_byte = temp[-1]
-    if temp >= 0 and temp <= 14 and all_same(temp[-1-last_byte:]):
+    if last_byte >= 0 and last_byte <= 14 and all_same(temp[-1-last_byte:]):
         temp = temp[:-1-last_byte]
     return temp
 
 def switch_half_blocks(block: bytes, block_size: int) -> bytes:
-    return bytes([block[block_size//2:], block[:block_size//2]])
+    return bytes(block[block_size//2:] + block[:block_size//2])
 
 def counter_to_block(count: int) -> bytes:
     return struct.pack('>QQ', (count >> 64) & 0xFFFFFFFFFFFFFFFF, count  & 0xFFFFFFFFFFFFFFFF)
