@@ -32,4 +32,4 @@ if __name__ == "__main__":
 
     if args.time:
         end = time.time()
-        print(f'Elapsed time: {start - end}', file=sys.stderr)
+        print(f'Elapsed time: {end - start:.5g}', file=sys.stderr)
