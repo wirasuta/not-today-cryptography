@@ -91,7 +91,7 @@ class NotToday(object):
         l = block[0:half_length]
         r = block[half_length:total_length]
 
-        for i in range(15):
+        for i in range(ROUND_NUM):
             new_r = int.from_bytes(l, 'little') ^ int.from_bytes(self._f_function(r, self.subkeys[i]), 'little')
             l = r
             r = new_r.to_bytes(8, 'little')
