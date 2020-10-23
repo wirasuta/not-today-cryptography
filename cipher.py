@@ -9,10 +9,36 @@ class NotToday(object):
         self.subkeys = self._key_scheduler(self.external_key, ROUND_NUM)
     
     def encrypt(self, plaintext: bytes) -> bytes:
-        pass
+        blocks = text_to_blocks(plaintext, BLOCK_SIZE)
+        enc_blocks = []
+
+        for i, block in enumerate(blocks):
+            if mode == 'ECB':
+                pass
+            elif mode == 'CBC':
+                pass
+            elif mode == 'Counter':
+                pass
+            else:
+                raise Exception('Invalid mode of operation')
+        
+        return b''.join(enc_blocks)
 
     def decrypt(self, ciphertext: bytes) -> bytes:
-        pass
+        blocks = text_to_blocks(ciphertext, BLOCK_SIZE)
+        dec_blocks = []
+
+        for i, block in enumerate(blocks):
+            if mode == 'ECB':
+                pass
+            elif mode == 'CBC':
+                pass
+            elif mode == 'Counter':
+                pass
+            else:
+                raise Exception('Invalid mode of operation')
+        
+        return blocks_to_text(dec_blocks)
 
     def _feistel_net(self, block: bytes, round_key: bytes) -> bytes:
         pass
