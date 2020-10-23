@@ -27,8 +27,19 @@ class NotToday(object):
 
         return l + r
 
-    def _f_function(self, half_block: bytes, round_key: bytes) -> bytes:
-        pass
+
+def _f_function(half_block: bytes, round_key: bytes) -> bytes:
+    temp = bytes()
+    half_block_roll = half_block[0] % 64
+    round_key_roll = round_key[0] % 64
+
+    for i in range(8):
+        new_value = roll_int_right(half_block[i], half_block_roll) ^ roll_int_right(round_key[i], round_key_roll)
+        temp = temp + bytes([new_value])
+
+    # S-Box substitution here
+
+    return roll_bits_right(temp, temp[7])
 
     def _key_scheduler(self, external_key: bytes, round: int) -> List[bytes]:
         if len(external_key) * 8 != 192:
