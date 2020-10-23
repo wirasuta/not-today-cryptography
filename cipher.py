@@ -10,15 +10,23 @@ class NotToday(object):
     
     def encrypt(self, plaintext: bytes) -> bytes:
         blocks = text_to_blocks(plaintext, BLOCK_SIZE)
+        iv = b'\x00' * BLOCK_SIZE
         enc_blocks = []
 
         for i, block in enumerate(blocks):
             if mode == 'ECB':
-                pass
+                enc = self._feistel_net(block)
+                enc_blocks.append(enc)
             elif mode == 'CBC':
-                pass
+                xorwith = iv if i == 0 else enc_blocks[-1]
+                temp = xor_bytes(block, xorwith)
+                enc = self._feistel_net(temp)
+                enc_blocks.append(enc)
             elif mode == 'Counter':
-                pass
+                counter_block = counter_to_block(i)
+                enc = self._feistel_net(counter_block)
+                enc = xor_bytes(block, enc)
+                enc_blocks.append(enc)
             else:
                 raise Exception('Invalid mode of operation')
         
@@ -26,15 +34,27 @@ class NotToday(object):
 
     def decrypt(self, ciphertext: bytes) -> bytes:
         blocks = text_to_blocks(ciphertext, BLOCK_SIZE)
+        iv = b'\x00' * BLOCK_SIZE
         dec_blocks = []
 
         for i, block in enumerate(blocks):
             if mode == 'ECB':
-                pass
+                temp = switch_half_blocks(block, BLOCK_SIZE)
+                dec = self._feistel_net(temp)
+                dec = switch_half_blocks(dec, BLOCK_SIZE)
+                dec_blocks.append(dec)
             elif mode == 'CBC':
-                pass
+                xorwith = iv if i == 0 else blocks[-1]
+                temp = switch_half_blocks(block, BLOCK_SIZE)
+                dec = self._feistel_net(temp)
+                dec = switch_half_blocks(dec, BLOCK_SIZE)
+                dec = xor_bytes(dec, xorwith)
+                dec_blocks.append(dec)
             elif mode == 'Counter':
-                pass
+                counter_block = counter_to_block(i)
+                enc = self._feistel_net(counter_block)
+                dec = xor_bytes(block, enc)
+                dec_blocks.append(dec)
             else:
                 raise Exception('Invalid mode of operation')
         

@@ -1,3 +1,4 @@
+import struct
 from typing import List
 
 def xor_bytes(a: bytes, b: bytes) -> bytes:
@@ -8,7 +9,7 @@ def roll_bytes_right(a: bytes, n: int) -> bytes:
 
 def roll_bits_right(a: bytes, n: int) -> bytes:
     temp = int.from_bytes(a, 'little')
-    temp = temp >> n | ((temp << (64 - n)) & 0xFFFFFFFF)
+    temp = (temp >> n | temp << (64 - n)) & 0xFFFFFFFFFFFFFFFF
     return temp.to_bytes(8, 'little')
 
 def text_to_blocks(t: bytes, block_size: int) -> List[bytes]:
@@ -33,3 +34,6 @@ def blocks_to_text(blocks: List[bytes]) -> bytes:
 
 def switch_half_blocks(block: bytes, block_size: int) -> bytes:
     return bytes([block[block_size//2:], block[:block_size//2]])
+
+def counter_to_block(count: int) -> bytes:
+    return struct.pack('>QQ', (count >> 64) & 0xFFFFFFFFFFFFFFFF, count  & 0xFFFFFFFFFFFFFFFF)
